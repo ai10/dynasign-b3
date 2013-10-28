@@ -13,10 +13,11 @@ Package.on_use(function (api) {
 
     api.add_files([
     'parsley-defaults.coffee',
-    'dynaSign.html'
+    'dynaSign.html',
+    'dynaSign.coffee'
     ], ['client']);
  
-    api.add_files('dynaSign.coffee', ['client', 'server']);
+    api.add_files('dynaSignMethods.coffee', ['client', 'server']);
 
   
 });

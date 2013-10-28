@@ -1,5 +1,5 @@
 if Meteor.isClient
-    @b3.accounts = {
+    accounts = {
         loginServices: false
         logo: '/images/logo.jpeg'
         askNames: true
@@ -11,6 +11,15 @@ if Meteor.isClient
 
 
 if Meteor.isServer
+
+    Accounts.config(
+        sendVerificationEmail: false
+        forbidClientAccountCreation: false
+        loginExpirationInDays: null
+    )
+
+
+
     Accounts.emailTemplates.siteName = "UltrasoundLearn.com"
 
     Accounts.emailTemplates.from = "Charles J. Short <charles.short@uscmed.sc.edu>"
@@ -29,9 +38,11 @@ if Meteor.isServer
         "Follow the link below to reset your password: \n\n"+url
 
     Accounts.onCreateUser(( options, user)->
+        console.log 'onCreateUser options', options
+        console.log 'oncreate', user
         if options.profile?
             user.profile = options.profile
-        return user
+        user
     )
     do ->
         "use strict"
