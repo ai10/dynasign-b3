@@ -3,18 +3,21 @@ Package.describe({
 });
 
 Package.on_use(function (api) {
-    api.use(['standard-app-packages', 'http', 'parsleyb3', 'helpless-b3', 'underscore', 'jquery'], 'client');
-    api.use(['coffeescript', 'accounts-base', 'accounts-password', 'iron-router'], ['client', 'server']);
-    api.imply(['accounts-base', 'accounts-password'],['client', 'server']);
+    api.use(['standard-app-packages', 'http', 'parsleyb3', 'underscore', 'jquery'], 'client');
+    api.use(['coffeescript', 'helpless-b3', 'accounts-base', 'accounts-password', 'iron-router'], ['client', 'server']);
+    api.imply(['accounts-base', 'accounts-password', 'helpless-b3'],['client', 'server']);
 
     api.add_files('mailgun-key.coffee', 'client');
 
-    api.add_files(['dynaConfigs.coffee', 'dynaSign.coffee'], ['client', 'server']);
+    api.add_files('dynaConfigs.coffee', ['client', 'server']);
 
     api.add_files([
     'parsley-defaults.coffee',
     'dynaSign.html'
     ], ['client']);
-   
+ 
+    api.add_files('dynaSign.coffee', ['client', 'server']);
+
+  
 });
 

@@ -9,6 +9,7 @@ if Meteor.isClient
            confirmationEmail: true
     }
 
+
 if Meteor.isServer
     Accounts.emailTemplates.siteName = "UltrasoundLearn.com"
 

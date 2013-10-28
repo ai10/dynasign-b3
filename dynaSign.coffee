@@ -3,12 +3,15 @@ Router.map ->
         path: '/verify-email/:token'
         action: ->
             token = @params.token
+            console.log 'verify-email token', token
             Accounts.verifyEmail token, (error)->
                 if error?
+                    console.log 'error', error, token
                     b3.flashError error.reason
                 else
                     b3.flashSuccess 'Account e-mail verification complete.'
-            Router.go 'home'
+                Router.go 'home'
+
     @route 'resetPassword',
         path: '/reset-password/:token'
         action: ->
@@ -29,7 +32,9 @@ Meteor.methods(
         false
     sendVerification: (email) ->
         if Meteor.isServer
+            console.log 'send verification', email
             if Meteor.userId()
+                console.log 'user', Meteor.userId()
                 Accounts.sendVerificationEmail(Meteor.userId(), email)
                 return true
             else
@@ -41,6 +46,9 @@ Meteor.methods(
                     throw new Meteor.Error 415, 'cannot verify null user without email.'
 )
 
+Accounts.config({sendVerificationEmail: true, forbidClientAccountCreation: false, loginExpirationIndays: 7})
+
+b3 = @b3
 b3.accountEvents = {}
 
 b3.logInTimeout = 0
@@ -219,12 +227,7 @@ b3.accountEvents.signPass = ( e , t )->
             b3.flashError error.reason, { single: 'dynaPass' }
         else
             b3.flashSuccess 'Welcome! Thanks for signing up.'
-            Meteor.call 'sendVerification', email,(error, result) ->
-                if error?
-                    b3.flashError error.reason
-                    return false
-                if result?
-                    b3.flashInfo "A verification e-mail should be delivered to #{email} shortly"
+            b3.flashInfo "A verification e-mail should be delivered to #{email} shortly"
             Session.set('dynaStep', 0)
     )
     false
@@ -246,106 +249,106 @@ b3.accountEvents.signUpNew = ( e, t ) ->
 
 
 b3.accountEvents.signOut = ->
-
-Meteor.startup( ->
-    Session.set 'dynaStep', 1
-    Session.set 'dynaUserExisting', false
-    Session.set 'dynaUserAuthenticated', false
-    Session.set 'dynaEmailMaybe', ""
-    Session.set 'dynaEmailValid', false
-    Session.set 'dynaEmailTooltip', 'e-mail sign in.'
-    Session.set 'dynaPasswordTooltip', 'password'
-    )
-
-Template.dynaSign.created = ()->
-
-Template.dynaSign.destroyed = ->
-    'dynaSign destroyed'
-
-Template.dynaSign.rendered = ->
-    if Meteor.user()
-        Session.set('dynaStep', 0)
-        Session.set('dynaUserExisting', true)
-        Session.set('dynaEmailValid', true)
-        Session.set('dynaEmailMaybe', Meteor.user().emails[0].address)
-
-    f = @firstNode
-    $(f)?.parsley('destroy')?.parsley b3.parsley
-
-Template.dynaSign.helpers
-    dynaEmailMaybe: ->
-        if Session.equals('dynaEmailValid', true)
-            return Session.get('dynaEmailMaybe')
-        else
-            return ""
-    emailTooltip: ->
-        Session.get('dynaEmailTooltip')
-    passwordTooltip: ->
-        Session.get('dynaPasswordTooltip')
-
-    signedInAs: ->
-        Meteor.user().username ?
-        (Meteor.user().profile?.name ?
-        (Meteor.user().emails[0]?.address ? "Logged In"))
-    showStep3: ->
-        if Session.equals('dynaStep', 3) then return ""
-        if Session.equals('dynaStep', 'reset') then return ""
-        "hidden"
-    showStep2: ->
-        if Session.equals('dynaStep', 2) then return ""
-        "hidden"
-    showStep1: ->
-        if Session.equals('dynaStep', 1) then return ""
-        "hidden"
-    showChangeUser: ->
-        if Session.equals('dynaStep', 1) then return "hidden"
-        ""
-    showComplete: ->
-        if Session.equals('dynaStep', 3)
-            if Session.equals('dynaUserExisting', false) then return ""
-        if Session.equals('dynaStep', 'reset') then return ""
-        "hidden"
-    showNew: ->
-        if Session.equals('dynaStep', 1)
-            if Session.equals('dynaEmailValid', true)
-                if Session.equals('dynaUserExisting', false) then return ""
-        "hidden"
-    showSignIn: ->
-        if Session.equals('dynaStep', 3)
-            if Session.equals('dynaUserExisting', true) then return ""
-        "hidden"
-
-Template.dynaSign.events
-    'change, keyup input#emailInput': b3.accountEvents.inputEmail
-    'change, keyup input#emailReEnter': b3.accountEvents.emailReEnter
-    'change, keyup input#passwordInput': b3.accountEvents.inputPassword
-    'keydown input': (e, t) ->
-        if e.keyCode is 13
-            e.preventDefault()
-            return
-    'click button#signUpNew': b3.accountEvents.signUpNew
-    'click button#signUpComplete': b3.accountEvents.signPass
-    'click button#signIn': b3.accountEvents.signPass
-    'click button#changeUser': ( e, t)->
-        e.preventDefault()
+if Meteor.isClient
+    Meteor.startup( ->
+        Session.set 'dynaStep', 1
+        Session.set 'dynaUserExisting', false
+        Session.set 'dynaUserAuthenticated', false
         Session.set 'dynaEmailMaybe', ""
         Session.set 'dynaEmailValid', false
-        Session.set 'dynaUserExisting', false
-        Session.set 'dynaStep', 1
-        if Meteor.userId()
-            Meteor.logout(->
-                Session.set 'dynaEmailMaybe', ""
-                Session.set 'dynaEmailValid', false
-                Session.set 'dynaUserExisting', false
-                Session.set 'dynaStep', 1
-            )
-        false
-    'click button#forgotPass': ->
-        if Session.equals('dynaUserExisting', true)
-            email = Session.get 'dynaEmailMaybe'
-            Accounts.forgotPassword { email: email }, (error)->
-                if error?
-                    b3.flashError 'Error:', error
-                else
-                    b3.flashSuccess "reset password link sent to #{email}"
+        Session.set 'dynaEmailTooltip', 'e-mail sign in.'
+        Session.set 'dynaPasswordTooltip', 'password'
+        )
+
+    Template.dynaSign.created = ()->
+
+    Template.dynaSign.destroyed = ->
+        'dynaSign destroyed'
+
+    Template.dynaSign.rendered = ->
+        if Meteor.user()
+            Session.set('dynaStep', 0)
+            Session.set('dynaUserExisting', true)
+            Session.set('dynaEmailValid', true)
+            Session.set('dynaEmailMaybe', Meteor.user().emails[0].address)
+
+        f = @firstNode
+        $(f)?.parsley('destroy')?.parsley b3.parsley
+
+    Template.dynaSign.helpers
+        dynaEmailMaybe: ->
+            if Session.equals('dynaEmailValid', true)
+                return Session.get('dynaEmailMaybe')
+            else
+                return ""
+        emailTooltip: ->
+            Session.get('dynaEmailTooltip')
+        passwordTooltip: ->
+            Session.get('dynaPasswordTooltip')
+
+        signedInAs: ->
+            Meteor.user().username ?
+            (Meteor.user().profile?.name ?
+            (Meteor.user().emails[0]?.address ? "Logged In"))
+        showStep3: ->
+            if Session.equals('dynaStep', 3) then return ""
+            if Session.equals('dynaStep', 'reset') then return ""
+            "hidden"
+        showStep2: ->
+            if Session.equals('dynaStep', 2) then return ""
+            "hidden"
+        showStep1: ->
+            if Session.equals('dynaStep', 1) then return ""
+            "hidden"
+        showChangeUser: ->
+            if Session.equals('dynaStep', 1) then return "hidden"
+            ""
+        showComplete: ->
+            if Session.equals('dynaStep', 3)
+                if Session.equals('dynaUserExisting', false) then return ""
+            if Session.equals('dynaStep', 'reset') then return ""
+            "hidden"
+        showNew: ->
+            if Session.equals('dynaStep', 1)
+                if Session.equals('dynaEmailValid', true)
+                    if Session.equals('dynaUserExisting', false) then return ""
+            "hidden"
+        showSignIn: ->
+            if Session.equals('dynaStep', 3)
+                if Session.equals('dynaUserExisting', true) then return ""
+            "hidden"
+
+    Template.dynaSign.events
+        'change, keyup input#emailInput': b3.accountEvents.inputEmail
+        'change, keyup input#emailReEnter': b3.accountEvents.emailReEnter
+        'change, keyup input#passwordInput': b3.accountEvents.inputPassword
+        'keydown input': (e, t) ->
+            if e.keyCode is 13
+                e.preventDefault()
+                return
+        'click button#signUpNew': b3.accountEvents.signUpNew
+        'click button#signUpComplete': b3.accountEvents.signPass
+        'click button#signIn': b3.accountEvents.signPass
+        'click button#changeUser': ( e, t)->
+            e.preventDefault()
+            Session.set 'dynaEmailMaybe', ""
+            Session.set 'dynaEmailValid', false
+            Session.set 'dynaUserExisting', false
+            Session.set 'dynaStep', 1
+            if Meteor.userId()
+                Meteor.logout(->
+                    Session.set 'dynaEmailMaybe', ""
+                    Session.set 'dynaEmailValid', false
+                    Session.set 'dynaUserExisting', false
+                    Session.set 'dynaStep', 1
+                )
+            false
+        'click button#forgotPass': ->
+            if Session.equals('dynaUserExisting', true)
+                email = Session.get 'dynaEmailMaybe'
+                Accounts.forgotPassword { email: email }, (error)->
+                    if error?
+                        b3.flashError 'Error:', error
+                    else
+                        b3.flashSuccess "reset password link sent to #{email}"
 
