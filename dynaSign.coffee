@@ -1,24 +1,9 @@
-if Meteor.isServer
-    do ->
-        "use strict"
-        Accounts.urls.resetPassword = (token)->
-            Meteor.absoluteUrl 'reset-password/'+token
-
-        Accounts.urls.verifyEmail = (token)->
-            Meteor.absoluteUrl 'verify-email/'+token
-
-        Accounts.urls.entrollAccount = (token)->
-            Meteor.absoluteUrl 'enroll-account/'+token
-
-
 Router.map ->
     @route 'verifyAccount',
         path: '/verify-email/:token'
         action: ->
             token = @params.token
-            console.log 'verifyAccountAction', token
             Accounts.verifyEmail token, (error)->
-                console.log 'accounts verify callback', error
                 if error?
                     b3.flashError error.reason
                 else
@@ -33,14 +18,9 @@ Router.map ->
             b3.flashInfo 'Please enter a new password.'
             Router.go 'home'
 
-
-
-
 Meteor.methods(
     checkIdentity: (email) ->
-        console.log 'check identity', email
         if Meteor.isServer
-            console.log 'check identity server', email
             user = Meteor.users.findOne { 'emails.address': email }
             if user?
                 return user
@@ -48,7 +28,6 @@ Meteor.methods(
                 return false
         false
     sendVerification: (email) ->
-        console.log 'verification email to', email
         if Meteor.isServer
             if Meteor.userId()
                 Accounts.sendVerificationEmail(Meteor.userId(), email)
@@ -60,18 +39,11 @@ Meteor.methods(
                     return true
                 else
                     throw new Meteor.Error 415, 'cannot verify null user without email.'
-        )
+)
 
-b3.accounts = {
-    loginServices: false
-    logo: '/images/logo.jpeg'
-    askNames: true
-    askEmail: true
-    dashboard: '/'
-}
 b3.accountEvents = {}
-b3.logInTimeout = 0
 
+b3.logInTimeout = 0
 
 b3.accountEvents.logIn = (email, password) ->
     if Meteor.userId()
@@ -132,12 +104,10 @@ b3.accountEvents.inputEmail = ( e, t ) ->
     keyCode = e.keyCode
     f = t.firstNode || e.target.f
     valid = $(f).find('input#emailInput').parsley('validate')
-    console.log 'inputEmail', valid, address, keyCode
     if valid
         if not address then return
         if address.length > 512
             throw new Meteor.Error 415, 'Stream exceeeds maximum length of 512.'
-        console.log 'preajax', address, b3.validate_api_key
         return $.ajax
             type: "GET"
             url: 'https://api.mailgun.net/v2/address/validate?callback=?'
@@ -145,7 +115,6 @@ b3.accountEvents.inputEmail = ( e, t ) ->
             dataType: "jsonp"
             crossDomain: true
             success: (data, status) ->
-                console.log 'ajax success', data, status
                 if not data.is_valid
                     Session.set('dynaEmailValid', false)
                     if data.did_you_mean?
@@ -164,7 +133,6 @@ b3.accountEvents.inputEmail = ( e, t ) ->
                     if Session.equals('dynaStep', 1)
                         Session.set 'dynaEmailMaybe', address
                         Meteor.call 'checkIdentity', address, (err, result)->
-                            console.log 'check identity', err, result
                             if result is false
                                 Session.set 'dynaUserExisting', false
                                 if keyCode is 13
@@ -189,7 +157,6 @@ b3.accountEvents.inputEmail = ( e, t ) ->
                                 else
                                     return false
             error: (request, status, error) ->
-                console.log 'mailgun error', request, status, error
 
 b3.accountEvents.emailReEnter = ( e, t ) ->
     if (e.target.id isnt 'emailReEnter') then return
@@ -243,14 +210,12 @@ b3.accountEvents.signPass = ( e , t )->
         return b3.accountEvents.logIn(email, password)
 
     profile = b3.accounts?.defaultProfile? || {}
-    console.log 'accounts create user', email, password, profile
     Accounts.createUser({
         email: email,
         password: password,
         profile: profile
     }, (error)->
         if error?
-            console.log error
             b3.flashError error.reason, { single: 'dynaPass' }
         else
             b3.flashSuccess 'Welcome! Thanks for signing up.'
@@ -281,7 +246,6 @@ b3.accountEvents.signUpNew = ( e, t ) ->
 
 
 b3.accountEvents.signOut = ->
-    console.log 'signout event TODO'
 
 Meteor.startup( ->
     Session.set 'dynaStep', 1
@@ -294,7 +258,6 @@ Meteor.startup( ->
     )
 
 Template.dynaSign.created = ()->
-    console.log 'dynasign created'
 
 Template.dynaSign.destroyed = ->
     'dynaSign destroyed'
