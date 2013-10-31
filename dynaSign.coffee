@@ -1,6 +1,4 @@
-VerifyAccountController = RouteController.extend {
-    template: 'home'
-    }
+console.log 'dynaSign'
 Router.map ->
     @route 'verifyAccount',
         path: '/verify-email/:token'
@@ -13,11 +11,7 @@ Router.map ->
                     b3.flashError error.reason
                 else
                     b3.flashSuccess 'Account e-mail verification complete.'
-
-            if error? then console.log 'preRouting: ', error
-            else
-                console.log 'no error'
-            Router.go 'home'
+                Router.go '/'
 
     @route 'resetPassword',
         path: '/reset-password/:token'
@@ -26,9 +20,8 @@ Router.map ->
             Session.set('dynaStep', 'reset')
             Session.set('dynaPasswordTooltip', 'Enter a new password.')
             b3.flashInfo 'Please enter a new password.'
-            Router.go 'home'
 
-accountEvents = {}
+accountEvents = @accountEvents = {}
 
 logInTimeout = 0
 
@@ -83,16 +76,17 @@ accountEvents.inputPassword = (e, t)->
             msg += '- min. 1 letter'
         Session.set('dynaPasswordTooltip', msg)
     false
-
-accountEvents.inputEmail = ( e, t ) ->
+accountEvents.inputEmail = ( e, t, cb ) ->
     e.preventDefault()
-    if (e.target.id isnt 'emailInput') then return
+    f = t.firstNode || e.target.f
+    valid = $(f).find('input.signIn').parsley('validate')
+    valid or= $(f).find('input#emailInput').parsley('validate')
     address = e.target.value
     keyCode = e.keyCode
-    f = t.firstNode || e.target.f
-    valid = $(f).find('input#emailInput').parsley('validate')
+    if not valid then return false
+    console.log 'akv', address, keyCode, valid
     if valid
-        if not address then return
+        if not address then return false
         if address.length > 512
             throw new Meteor.Error 415, 'Stream exceeeds maximum length of 512.'
         return $.ajax
@@ -115,11 +109,15 @@ accountEvents.inputEmail = ( e, t ) ->
                         single: 'dynaUser'
                     }
                     Session.set('dynaStep', 1)
+                    return cb? 'invalid', data.did_you_mean
                 if data.is_valid
                     Session.set('dynaEmailValid', true)
                     if Session.equals('dynaStep', 1)
                         Session.set 'dynaEmailMaybe', address
-                        Meteor.call 'checkIdentity', address, (err, result)->
+                        Meteor.call 'checkIdentity', address, (error, result) ->
+                            if error?
+                                b3.flashError error.reason
+                                return false
                             if result is false
                                 Session.set 'dynaUserExisting', false
                                 if keyCode is 13
@@ -128,7 +126,7 @@ accountEvents.inputEmail = ( e, t ) ->
                                     single: 'dynaUser'
                                     header: 'New email, sign up!'
                                 }
-                                return false
+                                return cb? 'new user'
                             else
                                 if result?
                                     Session.set 'dynaUserExisting', true
@@ -140,15 +138,18 @@ accountEvents.inputEmail = ( e, t ) ->
                                         single: 'dynaPass'
                                     }
                                     Session.set 'dynaStep', 3
-                                    return true
+                                    return cb? 'existing user'
                                 else
                                     return false
             error: (request, status, error) ->
+                b3.flashError error.reason
+        return false
 
-accountEvents.emailReEnter = ( e, t ) ->
-    if (e.target.id isnt 'emailReEnter') then return
+accountEvents.emailReEnter = ( e, t, cb ) ->
     f = t.firstNode || e.target.form
     valid = $(f).find('input#emailReEnter').parsley('validate')
+    valid = valid || $(f).find('input.emailReEnter').parsley('validate')
+    if not valid then return false
     if valid
         if Session.equals('dynaEmailMaybe', e.target.value)
             if Session.equals('dynaStep', 2)
@@ -167,6 +168,7 @@ accountEvents.emailReEnter = ( e, t ) ->
                 header: e.target.value+'- should match -'
                 single: 'dynaUser'
             }
+        cb?()
     false
 
 accountEvents.signPass = ( e , t )->
@@ -208,7 +210,7 @@ accountEvents.signPass = ( e , t )->
         else
             b3.flashSuccess 'Welcome! Thanks for signing up.'
             b3.flashInfo "A verification e-mail should be delivered to #{email} shortly."
-            Meteor.call 'sendValidationEmail',
+            Meteor.call 'sendVerificationEmail', email
             Session.set('dynaStep', 0)
     )
     false
@@ -230,84 +232,97 @@ accountEvents.signUpNew = ( e, t ) ->
 
 
 accountEvents.signOut = ->
+alertEvents = {}
 
-Meteor.startup( ->
-    Session.set 'dynaStep', 1
-    Session.set 'dynaUserExisting', false
-    Session.set 'dynaUserAuthenticated', false
-    Session.set 'dynaEmailMaybe', ""
-    Session.set 'dynaEmailValid', false
-    Session.set 'dynaEmailTooltip', 'e-mail sign in.'
-    Session.set 'dynaPasswordTooltip', 'password'
+throttlingTimeout = 0
+inputThrottle = (e, t, cb) ->
+    console.log 'throttle', e.target.value
+    unless throttlingTimeout is 0
+        clearTimeout throttlingTimeout
+
+    throttlingTimeout = setTimeout(->
+        cb(e, t)
+    ,
+        2000
     )
 
-Template.dynaSign.created = ()->
+alertEvents.signIn =  (e, t, alert) ->
+    email = e.target.value
+    console.log 'signIn', email
+    accountEvents.inputEmail e, t, (r, dum)=>
+        console.log 'rdum', r, dum, alert
+        if r is false then return
+        console.log 'alert', alert
+        b3.Alert::remove alert
+        if r is 'invalid'
+            console.log 'invalid'
+            if dum?
+                b3.promptEmail dum, {
+                    value: dum
+                    type: 'warning'
+                    header: 'Did you mean?'
+                }
+            else
+                b3.promptEmail email, {
+                    value: email
+                    type: 'warning'
+                    header: 'enter valid e-mail'
+                }
+            return
 
-Template.dynaSign.destroyed = ->
-    'dynaSign destroyed'
+        if r is 'new user'
+            b3.alertConfirmEmail e.target.value, {
+                placeholder: e.target.value
+                header: "Please confirm:"
+                label: "Re-enter #{e.target.value}"
+            }
+            return
+        if r is 'existing user'
+            b3.alertEnterPassword()
+            return
 
-Template.dynaSign.rendered = ->
-    if Meteor.user()
-        Session.set('dynaStep', 0)
-        Session.set('dynaUserExisting', true)
-        Session.set('dynaEmailValid', true)
-        Session.set('dynaEmailMaybe', Meteor.user().emails[0].address)
+Template.b3Alert.events
+    'keyup input.signIn': (e, t) ->
+        alert = @_id
+        cb = (e, t) =>
+            console.log 'cb fired', alert
+            return alertEvents.signIn e, t, alert
 
-    f = @firstNode
-    $(f)?.parsley('destroy')?.parsley b3.parsley
+        inputThrottle e, t, cb
 
-Template.dynaSign.helpers
-    dynaEmailMaybe: ->
-        if Session.equals('dynaEmailValid', true)
-            return Session.get('dynaEmailMaybe')
-        else
-            return ""
-    emailTooltip: ->
-        Session.get('dynaEmailTooltip')
-    passwordTooltip: ->
-        Session.get('dynaPasswordTooltip')
+    'keyup input.emailReEnter': (e, t) ->
+        alert = @_id
+        cb = (e,t) =>
+            return accountEvents.emailReEnter e, t, alert
 
-    signedInAs: ->
-        Meteor.user().username ?
-        (Meteor.user().profile?.name ?
-        (Meteor.user().emails[0]?.address ? "Logged In"))
-    showStep3: ->
-        if Session.equals('dynaStep', 3) then return ""
-        if Session.equals('dynaStep', 'reset') then return ""
-        "hidden"
-    showStep2: ->
-        if Session.equals('dynaStep', 2) then return ""
-        "hidden"
-    showStep1: ->
-        if Session.equals('dynaStep', 1) then return ""
-        "hidden"
-    showChangeUser: ->
-        if Session.equals('dynaStep', 1) then return "hidden"
-        ""
-    showComplete: ->
-        if Session.equals('dynaStep', 3)
-            if Session.equals('dynaUserExisting', false) then return ""
-        if Session.equals('dynaStep', 'reset') then return ""
-        "hidden"
-    showNew: ->
-        if Session.equals('dynaStep', 1)
-            if Session.equals('dynaEmailValid', true)
-                if Session.equals('dynaUserExisting', false) then return ""
-        "hidden"
-    showSignIn: ->
-        if Session.equals('dynaStep', 3)
-            if Session.equals('dynaUserExisting', true) then return ""
-        "hidden"
 
-Template.dynaSign.events
-    'change, keyup input#emailInput': accountEvents.inputEmail
-    'change, keyup input#emailReEnter': accountEvents.emailReEnter
-    'change, keyup input#passwordInput': accountEvents.inputPassword
+            b3.Alert::remove @_id
+            b3.alertConfirmPassword 'password', {
+                placeholder: 'password'
+                header: 'Please enter a password.'
+            }
+            return
+
+        inputThrottle e, t, cb
+
+    'change, keyup input.passwordInput': (e, t) ->
+        cb = accountEvents.inputPassword e, t, =>
+            b3.Alert::remove @_id
+            return
+
+        inputThrottle e, t, cb
+
     'keydown input': (e, t) ->
         if e.keyCode is 13
             e.preventDefault()
             return
-    'click button#signUpNew': accountEvents.signUpNew
+    'click button.signIn': (e, t) ->
+        cb = accountEvents.signUpNew e,t, =>
+            b3.Alert::remove(@_id)
+            b3.alertConfirmEmail '...', { placeholder: e.target.value }
+        inputThrottle e, t, cb
+
+    'click button#signUpNew': (e,t)->
     'click button#signUpComplete': accountEvents.signPass
     'click button#signIn': accountEvents.signPass
     'click button#changeUser': ( e, t)->
@@ -332,4 +347,50 @@ Template.dynaSign.events
                     b3.flashError 'Error:', error
                 else
                     b3.flashSuccess "reset password link sent to #{email}"
+
+
+@b3.promptEmail = @b3.Alert::curry {
+    dialog: true
+    type: 'info'
+    block: 'alert-block'
+    inputType: 'email'
+    selectClass: 'signIn'
+    header: 'Authentication.'
+    label: 'e-mail'
+    placeholder: 'e-mail ...'
+    icon: 'glyphicon glyphicon-envelope'
+}
+
+@b3.alertConfirmPassword = @b3.Alert::curry {
+    dialog: true
+    type: 'info'
+    block: 'alert-block'
+    inputType: 'password'
+    selectClass: 'enterPassword'
+    header: 'Enter Password'
+    icon: "glyphicon glyphicon-log-in"
+}
+
+@b3.alertEnterPassword = @b3.Alert::curry {
+    dialog: true
+    type: 'info'
+    block: 'alert-block'
+    inputType: 'password'
+    selectClass: 'signIn'
+    header: 'Enter Password'
+    icon: "glyphicon glyphicon-log-in"
+}
+
+@b3.alertConfirmEmail = @b3.Alert::curry {
+    dialog: true
+    showAltButton: true
+    altButtonText: " change e-mail."
+    altSelectClass: "changeUser"
+    type: 'info'
+    selectClass: 'signUpNew'
+    block: 'alert-block'
+    inputType: 'text'
+    header: 'New? Please confirm e-mail.'
+    icon: 'glyphicon glyphicon-envelope'
+}
 
