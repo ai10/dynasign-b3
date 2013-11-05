@@ -1,5 +1,6 @@
 if Meteor.isClient
-    accounts = {
+    dyna = @dyna = {}
+    dyna.accounts = {
         loginServices: false
         logo: '/images/logo.jpeg'
         askNames: true

@@ -16,7 +16,6 @@ Package.on_use(function (api) {
     'parsley-defaults.coffee',
     'dynaB3.coffee',
     'dynaAlert.html',
-    'dynaInline.html',
     'dynaRoutes.coffee',
     'identifyUnconfirmed.coffee',
     'confirmIdentity.coffee',
