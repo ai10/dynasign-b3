@@ -14,10 +14,16 @@ Package.on_use(function (api) {
 
     api.add_files([
     'parsley-defaults.coffee',
-    'dynaSign.html',
+    'dynaB3.coffee',
+    'dynaAlert.html',
     'dynaInline.html',
-    'dynaSign.coffee',
-    'dynaInline.coffee'
+    'dynaRoutes.coffee',
+    'identifyUnconfirmed.coffee',
+    'confirmIdentity.coffee',
+    'dynaPassword.coffee',
+    'signUpNew.coffee',
+    'signBack.coffee',
+    'dynaAlert.coffee'
     ], ['client']);
  
     api.add_files('dynaSignMethods.coffee', ['client', 'server']);
