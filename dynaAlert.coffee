@@ -40,6 +40,8 @@ Template.b3Alert.events
         if e.keyCode is 13
             e.preventDefault()
             return
+    'click button.enterPassword': ( e, t ) ->
+
 
 @b3.promptIdentity = @b3.Alert::curry {
     dialog: true
