@@ -28,7 +28,10 @@ dyna.inputThrottle = (e, t, cb) ->
 
     str = e.target.value
 
-    if not str
+    if not str?
+        click = true
+        i = t.find('input')
+        str = $(i).val()
 
 
     atat = str.indexOf("@")
@@ -53,6 +56,7 @@ dyna.inputThrottle = (e, t, cb) ->
             lapse = 4321
         else
             lapse = dyna.calculatedLapse
+    if click then lapse = 100
 
     throttlingTimeout = setTimeout(->
         cb(e, t)

@@ -72,8 +72,8 @@ Template.b3Alert.events
         dyna.inputThrottle e, t, cb
 
     'click button.changeUser': ( e, t ) ->
-        Session.set 'dynaStep', 1
         dyna.reset()
+        Session.set 'dynaStep', 1
         dyna.nextStep()
 
 
@@ -148,7 +148,6 @@ dyna.nextStep = =>
             return
 
 dyna.reset = =>
-    console.log 'dynareset'
     Session.set 'dynaStep', 0
     dyna.userEmail = 'invalid e-mail'
     dyna.userExisting = false
