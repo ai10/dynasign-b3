@@ -1,19 +1,12 @@
 dyna = @dyna
-
-console.log 'dyna', dyna
 Template.b3Alert.events
     'keyup input.identity': (e, t) ->
-        console.log 'keyup identity'
         dyna.identity = e.target.value
         alert = @_id
         initial_cb = (e, t) =>
-            console.log 'initial cb fired', alert
-            console.log 'dyna', dyna
             return dyna.identifyUnconfirmed e, t, alert
 
         confirm_cb = ( e, t ) =>
-            console.log 'confirm cb fired', alert
-            console.log 'dyna', dyna
             return dyna.confirmIdentity e, t, alert
 
         cb = initial_cb
@@ -22,18 +15,15 @@ Template.b3Alert.events
         dyna.inputThrottle e, t, cb
 
     'keyup input.password': (e, t) ->
-        console.log 'keyup input password'
         dyna.password = e.target.value
         alert = @_id
 
         back_cb = ( e, t ) =>
             dyna.signBack e, t, alert
-            console.log 'passBack cb fired'
             return
 
         upNew_cb = ( e, t ) =>
             dyna.signUpNew e, t, alert
-            console.log 'passNew cn fired'
             return
 
         cb = back_cb
@@ -47,7 +37,6 @@ Template.b3Alert.events
             return
     'click button.enterPassword': ( e, t ) ->
         step = Session.get 'dynaStep'
-        console.log 'button at step;', step
         if step is 'signUpNew'
             return dyna.signUpNew e, t
 
@@ -55,29 +44,22 @@ Template.b3Alert.events
             return dyna.signBack e, t
 
     'click button.identity': ( e, t) ->
-        console.log 'click identity', e, t
         i = t.find('input')
         dyna.identity = $(i).val()
         alert = @_id
         initial_cb = (e, t) =>
-            console.log 'initial cb fired', alert
-            console.log 'dyna', dyna
             return dyna.identifyUnconfirmed e, t, alert
 
         confirm_cb = ( e, t ) ->
-            console.log 'confirm cb fired', alert
-            console.log 'dyna', dyna
             return dyna.confirmIdentity e, t, alert
 
         cb = initial_cb
         if dyna.confirmation is true then cb = confirm_cb
-
         dyna.inputThrottle e, t, cb
 
     'click button.changeUser': ( e, t ) ->
         dyna.reset()
-        Session.set 'dynaStep', 'indentify'
-        dyna.nextStep()
+        dyna.nextStep 'identify'
 
 @b3.promptIdentity = @b3.Alert::curry {
     dialog: true
@@ -132,7 +114,10 @@ dyna.nextStep = (step)=>
     Session.set('dynaStep', step)
     dyna.resetThrottle()
     switch step
-        when 'init', 'identify' #authorization begins;
+        when 'init'
+            if not Meteor.user()
+                @b3.flashInfo ' please sign up or sign in.', { header: 'Welcome:' }
+        when 'identify' #authorization begins;
             if not dyna.valid and repeatStep
                 @b3.promptIdentity 'Invalid', {
                     single: 'identify'
@@ -160,7 +145,7 @@ dyna.nextStep = (step)=>
                     label: dyna.emailMaybe
                 }
             return
-        when 'password' #enter password
+        when 'signUpNew', 'signBack' #enter password
             if not dyna.valid and repeatStep
                 @b3.promptPassword 'Invalid', {
                     single: 'password'
@@ -170,7 +155,6 @@ dyna.nextStep = (step)=>
                 @b3.promptPassword "", {
                     single: 'password'
                 }
-
             return
 
         when 'forgot' #forgot password
@@ -193,27 +177,31 @@ dyna.reset = =>
     return true
 
 dyna.passwordReset = ->
-    b3.confirmIdentity 'Confirm e-mail for password reset', { header: dyna.emailMaybe, type: 'info', selectClass: 'forgotPassword' }
+    b3.confirmIdentity 'Confirm e-mail for password reset', {
+        header: dyna.emailMaybe
+        type: 'info'
+        selectClass: 'forgotPassword'
+    }
 
 Template.dynaSignButton.created = ->
     dyna.reset()
-    Session.set 'dynaStep', 'init'
     if Meteor.user()
         dyna.identity = Meteor.user().emails[0].address
         dyna.emailMaybe = dyna.identity
-        Session.set 'dynaStep', 'finished'
+        dyna.nextStep 'finished'
+    else
+        dyna.nextStep 'init'
 
 Template.dynaSignButton.button = ->
     step = Session.get 'dynaStep'
-    console.log 'dynaStep', step
     switch step
         when 'init', 'identify'
             return {
                 textL: 'Join!'
-                styleL: 'btn-success'
+                styleL: 'btn-primary'
                 iconL: ''
                 textR: ''
-                styleR: 'btn-primary'
+                styleR: 'btn-success'
                 iconR: 'glyphicon glyphicon-log-in'
                 size: ''
                 tooltipR: 'Log in.'
@@ -231,17 +219,17 @@ Template.dynaSignButton.button = ->
                 tooltipR: 'Change email.'
                 tooltipL: 'Unconfirmed email.'
             }
-        when 'password'
+        when 'signUpNew', 'signBack'
             return {
                 textL: dyna.emailMaybe
                 styleL: 'btn-info'
-                iconL: 'glyphicon glyphicon-user'
+                iconL: 'glyphicon glyphicon-question-sign'
                 textR: ''
                 styleR: 'btn-danger'
                 iconR: 'glyphicon glyphicon-remove-sign'
                 size: ''
                 tooltipR: 'Change email.'
-                tooltipL: 'Go to dashboard.'
+                tooltipL: 'Is this your correct email?'
             }
         when 'finished' # logged in? or somethings wrong.
             return {
@@ -286,13 +274,14 @@ Template.dynaSignButton.events
                 console.log 'error'
 
     'click button#dynaButtonRight': ( e, t ) ->
+        console.log 'click'
         switch Session.get 'dynaStep'
             when 'init'
                 b3.flashSuccess 'please authenticate.', { header: 'Welcome:' }
                 dyna.nextStep 'identify'
             when 'identify', 'confirmation'
+                console.log 'ic'
                 b3.flashInfo ' RESET', { header: 'Identity:' }
-                dyna.reset()
                 dyna.nextStep 'init'
             when 'signBack', 'forgot'
                 b3.flashInfo 'Request an email to reset your password.'
@@ -302,9 +291,14 @@ Template.dynaSignButton.events
                 b3.flashInfo 'a mix of letters and numbers known secretly by you.', { header: 'Password:' }
                 dyna.nextStep 'signUpNew'
             when 'finished'
-                b3.flashInfo 'Loggin out...'
-                Meteor.logout()
-                dyna.reset()
+                console.log 'finished'
+                return Meteor.logout(->
+                    dyna.reset()
+                    b3.flashInfo 'Logout complete.', { single: 'logout' }
+                    dyna.nextStep 'init'
+                )
+            else
+                throw new Meteor.error 415, 'dynaDign state invalid.'
 
     'mouseenter button': ( e, t ) ->
         $(e.target).tooltip('toggle')

@@ -14,7 +14,10 @@ dyna.signBack = ( e , t )->
     if password.length < 6
         hasError = true
     if hasError
-        b3.flashWarn 'requires a digit, non-digit letter, with minimum length of 6.', {header: 'Invalid Password', single: 'dynaPass' }
+        b3.flashWarn 'requires a digit, non-digit letter, with minimum length of 6.', {
+            header: 'Invalid Password'
+            single: 'dynaPass'
+        }
     if (not dyna.valid or hasError) then return
     if Session.equals('dynaStep', 'reset')
         token = Session.get('dynaToken')
@@ -44,7 +47,7 @@ dyna.signBack = ( e , t )->
                 header: 'Login Error:'
                 single: 'dynaPass'
             }
-            dyna.nextStep 'password'
+            dyna.nextStep 'signBack'
         else
             b3.flashSuccess email, {
                 header: 'Authenticated:'

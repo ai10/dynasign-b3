@@ -8,7 +8,7 @@ dyna.identifyUnconfirmed = ( e, t ) ->
     dyna.valid or= $(f).find('input#identity').parsley('validate')
     address = e.target.value
     keyCode = e.keyCode
-    if not dyna.valid then return dyna.nextStep()
+    if not dyna.valid then return dyna.nextStep 'identify'
     console.log 'valid input', address, keyCode, dyna.valid
     if dyna.valid
         if not address then return dyna.nextStep()
@@ -35,8 +35,7 @@ dyna.identifyUnconfirmed = ( e, t ) ->
                         header: "#{address} invalid, did you mean:"
                         single: 'dynaUser'
                     }
-                    Session.set('dynaStep', 1)
-                    return dyna.nextStep()
+                    return dyna.nextStep('identify')
                 if data.is_valid
                     dyna.valid = true
                     dyna.emailMaybe = address
@@ -44,16 +43,14 @@ dyna.identifyUnconfirmed = ( e, t ) ->
                         console.log 'checkidentity error, result', error, result
                         if error?
                             b3.flashError error.reason
-                            return dyna.nextStep false
+                            return dyna.nextStep 'identify'
                         if result is false
                             dyna.confirmed = false
                             b3.flashInfo address, {
                                 single: 'dynaUser'
                                 header: 'New email, sign up!'
                             }
-                            Session.set 'dynaStep', 2
-                            dyna.identity = ""
-                            return dyna.nextStep true
+                            return dyna.nextStep 'confirmation'
                         else
                             if result?
                                 dyna.confirmed = true
@@ -65,12 +62,11 @@ dyna.identifyUnconfirmed = ( e, t ) ->
                                 b3.flashInfo 'Please enter  password.',{
                                     single: 'dynaPass'
                                 }
-                                Session.set 'dynaStep', 4
-                                return dyna.nextStep true
+                                return dyna.nextStep 'signBack'
                             else
-                                return dyna.nextStep false
+                                return dyna.nextStep 'identify'
             error: (request, status, error) ->
                 b3.flashError error.reason
-        return dyna.nextStep()
+                return dyna.nextStep 'identify'
 
 
