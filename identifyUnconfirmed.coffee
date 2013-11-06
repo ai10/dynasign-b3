@@ -44,7 +44,7 @@ dyna.identifyUnconfirmed = ( e, t ) ->
                         console.log 'checkidentity error, result', error, result
                         if error?
                             b3.flashError error.reason
-                            return dyna.nextStep()
+                            return dyna.nextStep false
                         if result is false
                             dyna.confirmed = false
                             b3.flashInfo address, {
@@ -53,7 +53,7 @@ dyna.identifyUnconfirmed = ( e, t ) ->
                             }
                             Session.set 'dynaStep', 2
                             dyna.identity = ""
-                            return dyna.nextStep()
+                            return dyna.nextStep true
                         else
                             if result?
                                 dyna.confirmed = true
@@ -62,13 +62,13 @@ dyna.identifyUnconfirmed = ( e, t ) ->
                                     header: 'Welcome back:'
                                     single: 'dynaUser'
                                 }
-                                b3.flashInfo 'Please enter a password.',{
+                                b3.flashInfo 'Please enter  password.',{
                                     single: 'dynaPass'
                                 }
-                                Session.set 'dynaStep', 3
-                                return dyna.nextStep()
+                                Session.set 'dynaStep', 4
+                                return dyna.nextStep true
                             else
-                                return dyna.nextStep()
+                                return dyna.nextStep false
             error: (request, status, error) ->
                 b3.flashError error.reason
         return dyna.nextStep()

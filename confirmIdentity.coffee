@@ -6,7 +6,7 @@ dyna.confirmIdentity = ( e, t ) ->
     dyna.valid = dyna.valid || $(f).find('input.identity').parsley('validate')
     if not dyna.valid
         b3.flashError 'invalid: '+e.target.value
-        return dyna.nextStep()
+        return dyna.nextStep false
     else
         if dyna.emailMaybe is e.target.value
             if Session.equals('dynaStep', 2)
@@ -19,10 +19,10 @@ dyna.confirmIdentity = ( e, t ) ->
                     single: 'dynaPass'
                 }
                 Session.set('dynaStep', 3)
-                return dyna.nextStep()
+                return dyna.nextStep true
         else
             b3.flashWarn e.target.value, {
                 header: dyna.emailMaybe+'- should match -'
                 single: 'dynaUser'
             }
-            return dyna.nextStep()
+            return dyna.nextStep false

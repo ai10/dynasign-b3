@@ -33,7 +33,6 @@ dyna.inputThrottle = (e, t, cb) ->
         i = t.find('input')
         str = $(i).val()
 
-
     atat = str.indexOf("@")
     if atat < (dyna.keyCount - 1)
         if atat > -1
@@ -42,7 +41,7 @@ dyna.inputThrottle = (e, t, cb) ->
             dyna.calculatedLapse = dyna.defaultLapse
 
     if atat is (dyna.keyCount - 1)
-        dyna.calculatedLapse = 2*dyna.defaultLapse
+        dyna.calculatedLapse = 5*dyna.defaultLapse
 
     if (/\.com/.test(str) or /\.org/.test(str) or /\.net/.test(str) or /\.io/.test(str) or /\.me/.test(str) or /\.edu/.test(str))
         dyna.calculatedLapse = 100
@@ -57,6 +56,8 @@ dyna.inputThrottle = (e, t, cb) ->
         else
             lapse = dyna.calculatedLapse
     if click then lapse = 100
+
+    if dyna.keyCount > 5 then lapse = lapse/2
 
     throttlingTimeout = setTimeout(->
         cb(e, t)

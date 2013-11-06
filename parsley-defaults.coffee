@@ -7,18 +7,19 @@
         errorClass: 'has-error'
         successClass: 'has-success'
         validators:
-            hasnumber: (val) ->
+            password: (val, p) ->
+                i = parseInt(p)
+                console.log 'val, p, i', val, p, i
                 if not /[0-9]/.test(val)
                     return false
-                true
-            hasletter: (val) ->
                 if not /[a-z]/i.test(val)
+                    return false
+                if val.lenth < i
                     return false
                 true
         showErrors: true
         messages:
-            hasnumber: ""
-            hasletter: ""
+            password: "Requires %s character with letters and digits."
 
         validateIfUnchanged: true
         errors:
@@ -27,6 +28,9 @@
 
             container: (e, r) ->
                 p = e.parent()
+                console.log 'e,r', e, r
+                return e.context
+            ### for putting comment into tooltip
                 s = "div##{e.context.id}.tooltip"
                 pop = $(s)
                 $c= pop.find('.tooltip-title')
@@ -36,6 +40,7 @@
                     $n = pop.find('.tooltip-title')
                     return $n
                 return $c
+            ###
             errorsWrapper: '<ul></ul>'
             errorElem: '<li></li>'
         listeners:
