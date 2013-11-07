@@ -1,15 +1,6 @@
 if Meteor.isClient
     dyna = @dyna = {}
-    dyna.accounts = {
-        loginServices: false
-        logo: '/images/logo.jpeg'
-        askNames: true
-        askEmail: true
-        dashboard: '/'
-        config:
-           confirmationEmail: true
-    }
-
+    dyna.isInline = true
 
 if Meteor.isServer
 
@@ -18,8 +9,6 @@ if Meteor.isServer
         forbidClientAccountCreation: false
         loginExpirationInDays: null
     )
-
-
 
     Accounts.emailTemplates.siteName = "UltrasoundLearn.com"
 
