@@ -1,4 +1,3 @@
-console.log 'dynaSign'
 dyna = @dyna
 dyna.confirmed = false
 
@@ -49,7 +48,6 @@ dyna.inputThrottle = (e, t, cb) ->
     switch e.keyCode
         when 13 then lapse = 100
         when 8, 37, 39
-            console.log 'backup'
             dyna.resetThrottle()
             dyna.keyCount = 1
             lapse = 4321

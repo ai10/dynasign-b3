@@ -1,10 +1,16 @@
 dyna = @dyna
 dyna.confirmIdentity = ( e, t ) ->
+    #get form whether a click or a keyup.
     f = t.firstNode || e.target.form
-    dyna.valid = $(f).find('input#identity').parsley('validate')
-    dyna.valid = dyna.valid || $(f).find('input.identity').parsley('validate')
+    #should user carriage return after auto don't act on empty.
+    if e.keyCode is 13
+        if e.target.value.length < 2 then return
+    #validate input with parsley
+    dyna.valid = $(f).find('input.identity').parsley('validate')
     if not dyna.valid
-        b3.flashError 'invalid: '+e.target.value, { single: 'matchEmail' }
+        b3.flashError 'invalid: '+e.target.value, {
+            single: 'matchEmail'
+        }
         return dyna.nextStep 'confirmation'
     else
         if dyna.emailMaybe is e.target.value

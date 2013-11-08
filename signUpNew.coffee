@@ -11,7 +11,7 @@ dyna.signUpNew = ( e, t ) ->
         hasError = true
     if not (/\D/.test password)
         hasError = true
-    if password.length < 6
+    if password?.length < 6
         hasError = true
     if hasError
         b3.flashWarn 'requires a digit, non-digit letter, with minimum length of 6.', {header: 'Invalid Password', single: 'dynaPass' }

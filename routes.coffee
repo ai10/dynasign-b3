@@ -1,10 +1,11 @@
 Router.map ->
-    @route 'verifyAccount',
+    @route 'verifyEmail',
         path: '/verify-email/:token'
         action: ->
             token = @params.token
             console.log 'verify-email token', token
-            Accounts.verifyEmail token, (error)->
+            u = Meteor.users.findOne { everification: token }
+            Meteor.call 'completeVerify', token, (error)->
                 if error?
                     console.log 'error', error, token
                     b3.flashError error.reason
