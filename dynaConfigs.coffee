@@ -5,9 +5,9 @@ if Meteor.isClient
 if Meteor.isServer
 
     Accounts.config(
-        sendVerificationEmail: false
+        sendVerificationEmail: true
         forbidClientAccountCreation: false
-        loginExpirationInDays: null
+        loginExpirationInDays: 30
     )
 
     Accounts.emailTemplates.siteName = "UltrasoundLearn.com"
@@ -28,8 +28,6 @@ if Meteor.isServer
         "Follow the link below to reset your password: \n\n"+url
 
     Accounts.onCreateUser(( options, user)->
-        console.log 'onCreateUser options', options
-        console.log 'oncreate', user
         if options.profile?
             user.profile = options.profile
         user

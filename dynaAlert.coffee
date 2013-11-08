@@ -9,8 +9,14 @@ Template.b3Alert.events
         confirm_cb = ( e, t ) =>
             return dyna.confirmIdentity e, t, alert
 
-        cb = initial_cb
-        if dyna.confirmation is true then cb = confirm_cb
+        forgot_cb = ( e, t ) =>
+            return dyna.forgotPassword e, t, alert
+
+        switch Session.get('dynaStep')
+            when 'confirmation' then cb = confirm_cb
+            when 'forgot' then cb = forgot_cb
+            else
+                cb = initial_cb
 
         dyna.inputThrottle e, t, cb
 
@@ -27,7 +33,9 @@ Template.b3Alert.events
             return
 
         cb = back_cb
-        if Session.equals('dynaStep', 'signUpNew') then cb = upNew_cb
+        if Session.equals('dynaStep', 'signUpNew')
+            cb = upNew_cb
+            unless e.keyCode is 13 then return
 
         dyna.inputThrottle e, t, cb
 
@@ -35,7 +43,7 @@ Template.b3Alert.events
         if e.keyCode is 13
             e.preventDefault()
             return
-    'click button.enterPassword': ( e, t ) ->
+    'click button.password': ( e, t ) ->
         step = Session.get 'dynaStep'
         if step is 'signUpNew'
             return dyna.signUpNew e, t
@@ -132,21 +140,22 @@ dyna.nextStep = (step)=>
             return
         when 'confirmation' #confirm identity then password.
             dyna.confirmation = true
-            if not dyna.valid and repeatStep
-                @b3.confirmIdentity 'Invalid', {
+            if not dyna.valid or repeatStep
+                @b3.confirmIdentity 'Invalid input.', {
                     single: 'confirmation'
                     value: dyna.identity
-                    type: 'danger'
+                    type: 'warning'
+                    label: dyna.emailMaybe
                 }
             else
                 @b3.confirmIdentity 'Please confirm:', {
                     single: 'confirmation'
-                    value: dyna.identity
+                    placeholder: dyna.identity
                     label: dyna.emailMaybe
                 }
             return
         when 'signUpNew', 'signBack' #enter password
-            if not dyna.valid and repeatStep
+            if (not dyna.valid) or (repeatStep)
                 @b3.promptPassword 'Invalid', {
                     single: 'password'
                     type: 'warning'
@@ -183,7 +192,7 @@ dyna.passwordReset = ->
         selectClass: 'forgotPassword'
     }
 
-Template.dynaSignButton.created = ->
+Template.dynaSignAlert.created = ->
     dyna.reset()
     if Meteor.user()
         dyna.identity = Meteor.user().emails[0].address
@@ -192,7 +201,7 @@ Template.dynaSignButton.created = ->
     else
         dyna.nextStep 'init'
 
-Template.dynaSignButton.button = ->
+Template.dynaSignAlert.button = ->
     step = Session.get 'dynaStep'
     switch step
         when 'init', 'identify'
@@ -219,7 +228,7 @@ Template.dynaSignButton.button = ->
                 tooltipR: 'Change email.'
                 tooltipL: 'Unconfirmed email.'
             }
-        when 'signUpNew', 'signBack'
+        when 'signUpNew'
             return {
                 textL: dyna.emailMaybe
                 styleL: 'btn-info'
@@ -230,6 +239,18 @@ Template.dynaSignButton.button = ->
                 size: ''
                 tooltipR: 'Change email.'
                 tooltipL: 'Is this your correct email?'
+            }
+        when 'signBack'
+            return {
+                textL: ""
+                styleL: 'btn-success'
+                iconL: 'glyphicon glyphicon-user'
+                textR: 'Password'
+                styleR: 'btn-inverse btn-default'
+                iconR: 'glyphicon glyphicon-question-sign'
+                size: ''
+                tooltipR: 'Reset password'
+                tooltipL: 'Change email?'
             }
         when 'finished' # logged in? or somethings wrong.
             return {
@@ -243,8 +264,19 @@ Template.dynaSignButton.button = ->
                 tooltipL: 'Go to dashboard.'
                 tooltipR: 'Log out.'
             }
-
-Template.dynaSignButton.events
+        when 'forgot'
+            return {
+                textL: 'Join!'
+                styleL: 'btn-primary'
+                iconL: ''
+                textR: ''
+                styleR: 'btn-success'
+                iconR: 'glyphicon glyphicon-log-in'
+                size: ''
+                tooltipR: 'Log in.'
+                tooltipL: 'Sign up!'
+            }
+Template.dynaSignAlert.events
     'click button#dynaButtonLeft': (e, t) ->
         console.log 'dynaSignClickLeft', e
         step = Session.get('dynaStep')

@@ -19,7 +19,8 @@
                 true
         showErrors: true
         messages:
-            password: "Requires %s character with letters and digits."
+            password: "Insufficiently complex."
+            email: "e.g. example@host.net"
 
         validateIfUnchanged: true
         errors:

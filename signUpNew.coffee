@@ -6,7 +6,7 @@ dyna.signUpNew = ( e, t ) ->
     $f= $ f
     dyna.valid = $(f).find('input.password').parsley('validate')
     dyna.valid or= $(f).find('input#password').parsley('validate')
-    password = $f.find('input.password').val()
+    password = $f.find('input').val()
     if not (/\d/.test password)
         hasError = true
     if not (/\D/.test password)
@@ -18,7 +18,6 @@ dyna.signUpNew = ( e, t ) ->
 
     if (not dyna.valid or hasError) then return
 
-    password = $f.find('input').val()
     email = dyna.emailMaybe or dyna.identity
     profile = dyna.accounts?.profile? or {}
     return Accounts.createUser({
@@ -32,6 +31,5 @@ dyna.signUpNew = ( e, t ) ->
         else
             b3.flashSuccess 'Welcome! Thanks for signing up.'
             b3.flashInfo "A verification e-mail should be delivered to #{email} shortly."
-            Meteor.call 'sendVerificationEmail', email
             dyna.nextStep 'finished'
     )

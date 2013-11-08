@@ -9,8 +9,8 @@ Router.map ->
                     console.log 'error', error, token
                     b3.flashError error.reason
                 else
+                    console.log 'success'
                     b3.flashSuccess 'Account e-mail verification complete.'
-                Router.go '/'
 
     @route 'resetPassword',
         path: '/reset-password/:token'

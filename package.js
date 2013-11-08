@@ -15,6 +15,7 @@ Package.on_use(function (api) {
     api.add_files([
     'parsley-defaults.coffee',
     'dynaB3.coffee',
+    'dynaSign.html',
     'dynaAlert.html',
     'dynaRoutes.coffee',
     'identifyUnconfirmed.coffee',
