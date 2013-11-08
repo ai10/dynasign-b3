@@ -15,6 +15,7 @@ Package.on_use(function (api) {
     api.add_files([
     'parsley-defaults.coffee',
     'throttle.coffee',
+    'nextStep.coffee',
     'dynaSign.html',
     'dynaAlert.html',
     'routes.coffee',
@@ -23,7 +24,8 @@ Package.on_use(function (api) {
     'inputPassword.coffee',
     'signUpNew.coffee',
     'signBack.coffee',
-    'dynaAlert.coffee'
+    'dynaAlert.coffee',
+    'dynaButton.coffee'
     ], ['client']);
  
 });
