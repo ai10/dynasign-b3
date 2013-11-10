@@ -1,25 +1,25 @@
 dyna = @dyna
 dyna.resetPassword = ( e, t ) ->
     console.log 'resetPassword', e, t
-    f = t.firstNode || e.target.form
-    dyna.valid = $(f).find('input.password').parsley('validate')
+    e.preventDefault()
+    f = t.firstNode or e.target.form
+    $i = $(f).find('input.password')
+    dyna.valid = $i.parsley('validate')
+    password = $i.val()
     if not dyna.valid
         b3.flashError 'invalid: '+e.target.value, {
             single: 'resetPassword'
         }
         return dyna.nextStep 'resetPassword'
     else
-        if e.keyCode is 13
-            token = Session.get('dynaToken')
-            password = $(f).find('input.password').val()
-            Accounts.resetPassword token, password, (error)->
-                    if error?
-                        b3.flashError error.reason
-                        return dyna.nextStep 'forgot'
-                    else
-                        b3.flashSuccess ' successfully reset', {
-                            header: 'Password:'
-                        }
-                        return dyna.nextStep 'init'
-        else
-            return
+        token = Session.get('dynaToken')
+        Accounts.resetPassword token, password, (error)->
+            if error?
+                b3.flashError error.reason
+                return dyna.nextStep 'resetPassword'
+            else
+                b3.flashSuccess ' successfully reset', {
+                    header: 'Password:'
+                }
+                dyna.nextStep 'finished'
+                return Router.go '/'

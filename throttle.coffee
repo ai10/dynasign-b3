@@ -13,13 +13,14 @@ dyna.resetThrottle = =>
     dyna.calculatedLapse = dyna.defaultLapse
 
 dyna.inputThrottle = (e, t, cb) ->
+    console.log 'throttle'
     unless throttlingTimeout is 0
         clearTimeout throttlingTimeout
     stamp = new Date().getTime()
     if dyna.keyCount++ is 0
         dyna.firstStamp = stamp
         return
-
+    console.log 'dyna.keycount', dyna.keyCount
     dyna.difLapse = stamp - dyna.lastStamp
     dyna.lastStamp = stamp
     dyna.difTotal = stamp - dyna.firstStamp
@@ -56,7 +57,7 @@ dyna.inputThrottle = (e, t, cb) ->
     if click then lapse = 100
 
     if dyna.keyCount > 5 then lapse = lapse/2
-
+    console.log 'throttlelapse', lapse
     throttlingTimeout = setTimeout(->
         cb(e, t)
     ,

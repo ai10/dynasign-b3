@@ -5,13 +5,15 @@ Template.dynaButton.created = ->
         dyna.identity = Meteor.user().emails[0].address
         dyna.emailMaybe = dyna.identity
         dyna.nextStep 'finished'
+    if Session.equals 'dynaStep', 'resetPassword'
+        dyna.nextStep 'resetPassword'
     else
         dyna.nextStep 'init'
 
 Template.dynaButton.button = ->
     step = Session.get 'dynaStep'
     switch step
-        when 'init', 'identify'
+        when 'init', 'identify', 'resetPassword'
             return {
                 textL: 'Join!'
                 styleL: 'btn-primary'
@@ -83,11 +85,12 @@ Template.dynaButton.button = ->
                 tooltipR: 'Log in.'
                 tooltipL: 'Sign up!'
             }
+
 Template.dynaButton.events
     'click button#dynaButtonLeft': (e, t) ->
         step = Session.get('dynaStep')
         switch step
-            when 'init'
+            when 'init', 'resetPassword'
                 b3.flashInfo ' please provide an email.', {
                     header: 'Hello!'
                 }

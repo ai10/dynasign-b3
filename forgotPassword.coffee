@@ -1,11 +1,13 @@
 dyna = @dyna
-dyna.forgotPassword = ( e, t ) ->
+dyna.forgotPassword = ( e, t, opt ) ->
+    if e.firm is false then return dyna.nextStep 'forgot'
     f = t.firstNode || e.target.form
     dyna.valid = $(f).find('input.identity').parsley('validate')
     if not dyna.valid
         b3.flashError 'invalid: '+e.target.value, { single: 'matchEmail' }
         return dyna.nextStep 'forgot'
     else
+
         if dyna.emailMaybe is e.target.value
             if Session.equals('dynaStep', 'forgot')
                 b3.flashSuccess e.target.value, {

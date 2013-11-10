@@ -1,15 +1,14 @@
 dyna = @dyna
 
 dyna.identifyUnconfirmed = ( e, t ) ->
-    console.log 'identifyUnconfirmed', e.target.value
     e.preventDefault()
     f = t.firstNode || e.target.f
     dyna.valid = $(f).find('input.identity').parsley('validate')
-    dyna.valid or= $(f).find('input#identity').parsley('validate')
     address = e.target.value
     keyCode = e.keyCode
-    if not dyna.valid then return dyna.nextStep 'identify'
-    console.log 'valid input', address, keyCode, dyna.valid
+    if not dyna.valid
+        dyna.pendingMailgun = false
+        return dyna.nextStep 'identify'
     if dyna.valid
         if not address then return dyna.nextStep()
         if address.length > 512
@@ -21,7 +20,6 @@ dyna.identifyUnconfirmed = ( e, t ) ->
             dataType: "jsonp"
             crossDomain: true
             success: (data, status) ->
-                console.log 'mailgun result', data
                 if not data.is_valid
                     dyna.confirmed = false
                     dyna.valid = false
@@ -40,7 +38,6 @@ dyna.identifyUnconfirmed = ( e, t ) ->
                     dyna.valid = true
                     dyna.emailMaybe = address
                     Meteor.call 'checkIdentity', address, (error, result) ->
-                        console.log 'checkidentity error, result', error, result
                         if error?
                             b3.flashError error.reason
                             return dyna.nextStep 'identify'
@@ -50,11 +47,13 @@ dyna.identifyUnconfirmed = ( e, t ) ->
                                 single: 'dynaUser'
                                 header: 'New email, sign up!'
                             }
+                            if Session.equals('dynaStep', 'confirmation') then return
                             return dyna.nextStep 'confirmation'
                         else
                             if result?
                                 dyna.confirmed = true
                                 dyna.userExisting = true
+                                if Session.equals('dynaStep', 'signBack') then return
                                 b3.flashSuccess address, {
                                     header: 'Welcome back:'
                                     single: 'dynaUser'
