@@ -21,7 +21,6 @@ Package.on_use(function (api) {
     'routes.coffee',
     'identityUnconfirmed.coffee',
     'confirmIdentity.coffee',
-    'inputPassword.coffee',
     'signUpNew.coffee',
     'signBack.coffee',
     'dynaAlert.coffee',

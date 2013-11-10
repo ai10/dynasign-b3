@@ -3,15 +3,22 @@ Router.map ->
         path: '/verify-email/:token'
         action: ->
             token = @params.token
-            console.log 'verify-email token', token
-            u = Meteor.users.findOne { everification: token }
-            Meteor.call 'completeVerify', token, (error)->
+            Meteor.call 'completeVerify', token, (error, result)->
                 if error?
-                    console.log 'error', error, token
                     b3.flashError error.reason
-                else
-                    console.log 'success'
-                    b3.flashSuccess 'Account e-mail verification complete.'
+                if result?
+                    if result is false
+                        b3.flashError "token does not match."
+                    else
+                        dyna.emailMaybe = result
+                        b3.flashSuccess "#{result} verified."
+                setTimeout(->
+                    Router.go '/'
+                ,
+                2800
+                )
+
+
 
     @route 'resetPassword',
         path: '/reset-password/:token'

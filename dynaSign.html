@@ -1,7 +1,15 @@
 <template name="dynaSign">
-{{#if inline }}
-  {{> dynaInline }}
-{{else}}
-  {{> dynaButton }}
-{{/if}}
+<ul class="nav navbar-nav navbar-right">
+  {{#if inline }}
+    {{> dynaInline }}
+  {{else}}
+    {{> dynaButton }}
+  {{/if}}
+</ul>
+</template>
+<template name="verifyEmail">
+<h1>Verifying account email... </h1>
+</template>
+<template name="resetEmail">
+<h1>Reset email ...</h1>
 </template>

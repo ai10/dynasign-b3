@@ -11,6 +11,13 @@ Meteor.methods
     completeVerify: (token) ->
         if Meteor.isServer
             u = Meteor.user()
-            if u?.services?.email?.verficationTokens? is token then return true
+            if not u?
+                u = Meteor.users.findOne {
+                    'services.email.verificationTokens.token': token
+                }
+            vTokens = u?.services?.email?.verificationTokens
+            if vTokens?
+                currentToken = _.findWhere vTokens, { token: token }
+                if currentToken?
+                    return currentToken.address
             false
-
