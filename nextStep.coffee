@@ -31,7 +31,7 @@ dyna = @dyna
 @b3.confirmIdentity = @b3.Alert::curry {
     dialog: true
     confirmation: false
-    buttonText: 'RESET'
+    buttonText: ' RESET'
     buttonClass: 'warning'
     showAltButton: false
     region: 'middleCenter'
@@ -56,7 +56,7 @@ dyna.nextStep = (step)=>
                 @b3.flashInfo ' please sign up or sign in.', { header: 'Welcome:' }
         when 'identify' #authorization begins;
             if not dyna.valid and repeatStep
-                @b3.promptIdentity 'Invalid', {
+                @b3.promptIdentity 'Invalid email', {
                     single: 'identify'
                     value: dyna.identity
                     header: dyna.userEmail
@@ -85,7 +85,7 @@ dyna.nextStep = (step)=>
             return
         when 'signUpNew', 'signBack' #enter password
             if (not dyna.valid) or (repeatStep)
-                @b3.promptPassword 'Invalid', {
+                @b3.promptPassword 'Invalid password', {
                     single: 'password'
                     type: 'warning'
                 }
@@ -96,11 +96,40 @@ dyna.nextStep = (step)=>
             return
 
         when 'forgot' #forgot password
-            if not dyna.valid and repeatStep
-                @b3.confirmIdentity 'Reset Password', {
+            if (not dyna.valid) or (repeatStep)
+                @b3.confirmIdentity dyna.emailMaybe, {
+                    header: 'Confirm reset: '
                     confirmation: true
+                    single: 'resetPassword'
+                    value: dyna.identity
+                    buttonClass: 'btn btn-danger'
+                    buttonIcon: 'glyphicon glyphicon-refresh'
+                    type: 'warning'
+                    label: 'Re-enter email for password reset.'
                 }
-
+            else
+                @b3.confirmIdentity dyna.emailMaybe, {
+                    header: 'Confirm reset: '
+                    confirmation: true
+                    single: 'resetPassword'
+                    buttonClass: 'btn btn-danger'
+                    buttonIcon: 'glyphicon glyphicon-refresh'
+                    type: 'warning'
+                    label: 'Re-enter email for password reset.'
+                }
+        when 'resetPassword'
+            if not dyna.valid or repeatStep
+                @b3.promptPassword ' a new password', {
+                    header: 'Enter:'
+                    confirmation: true
+                    single: 'resetPassword'
+                }
+            else
+                @b3.promptPassword ' a new password', {
+                    header:  'Enter:'
+                    confirmation: true
+                    single: 'resetPassword'
+                }
         else
             return
 
@@ -113,12 +142,5 @@ dyna.reset = =>
     dyna.valid = true
     @b3.Alert::clearAll()
     return true
-
-dyna.passwordReset = ->
-    b3.confirmIdentity 'Confirm e-mail for password reset', {
-        header: dyna.emailMaybe
-        type: 'info'
-        selectClass: 'forgotPassword'
-    }
 
 

@@ -121,7 +121,6 @@ Template.dynaButton.events
             when 'signBack', 'forgot'
                 b3.flashInfo 'Request an email to reset your password.'
                 dyna.nextStep 'forgot'
-                dyna.passwordReset()
             when 'signUpNew'
                 b3.flashInfo 'a mix of letters and numbers known secretly by you.', { header: 'Password:' }
                 dyna.nextStep 'signUpNew'

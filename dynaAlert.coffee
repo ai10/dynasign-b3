@@ -32,9 +32,17 @@ Template.b3Alert.events
             dyna.signUpNew e, t, alert
             return
 
+        resetPass_cb = ( e, t ) =>
+            dyna.resetPasword e, t
+            return
+
         cb = back_cb
         if Session.equals('dynaStep', 'signUpNew')
             cb = upNew_cb
+            unless e.keyCode is 13 then return
+
+        if Session.equals('dynaStep', 'resetPassword')
+            cb = resetPass_cb
             unless e.keyCode is 13 then return
 
         dyna.inputThrottle e, t, cb

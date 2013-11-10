@@ -12,20 +12,20 @@ Router.map ->
                     else
                         dyna.emailMaybe = result
                         b3.flashSuccess "#{result} verified."
+                        Session.set 'dynaStep', 'finished'
                 setTimeout(->
                     Router.go '/'
                 ,
                 2800
                 )
+            @render()
 
 
 
     @route 'resetPassword',
         path: '/reset-password/:token'
         action: ->
-            Session.set('dynaToken', @params.token)
-            Session.set('dynaStep', 'reset')
-            Session.set('dynaPasswordTooltip', 'Enter a new password.')
-            b3.flashInfo 'Please enter a new password.'
-
-
+            token = @params.token
+            Session.set('dynaToken', token)
+            dyna.nextStep 'resetPassword'
+            @render()
