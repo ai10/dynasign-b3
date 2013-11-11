@@ -1,6 +1,6 @@
 dyna = @dyna
 
-dyna.identifyUnconfirmed = ( e, t ) ->
+dyna.identityUnconfirmed = ( e, t ) ->
     e.preventDefault()
     f = t.firstNode || e.target.f
     dyna.valid = $(f).find('input.identity').parsley('validate')

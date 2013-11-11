@@ -1,6 +1,5 @@
 dyna = @dyna
 dyna.resetPassword = ( e, t ) ->
-    console.log 'resetPassword', e, t
     e.preventDefault()
     f = t.firstNode or e.target.form
     $i = $(f).find('input.password')
@@ -21,5 +20,5 @@ dyna.resetPassword = ( e, t ) ->
                 b3.flashSuccess ' successfully reset', {
                     header: 'Password:'
                 }
-                dyna.nextStep 'finished'
+                dyna.nextStep 'init'
                 return Router.go '/'

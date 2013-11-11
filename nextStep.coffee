@@ -50,10 +50,25 @@ dyna.nextStep = (step)=>
     if not repeatStep then @b3.Alert::remove { dialog: true }
     Session.set('dynaStep', step)
     dyna.resetThrottle()
+    if Meteor.userId()
+        dyna.emailMaybe = Meteor.user().emails[0].address
+        switch step
+            when 'resetPassword'
+                @b3.promptPassword ' a new password', {
+                    header:  'Enter:'
+                    confirmation: true
+                    single: 'resetPassword'
+                }
+                return
+            else
+                Session.set('dynaStep', 'finished')
+                return
+
     switch step
         when 'init'
-            if not Meteor.user()
-                @b3.flashInfo ' please sign up or sign in.', { header: 'Welcome:' }
+            @b3.flashInfo ' please sign up or sign in.', {
+                header: 'Welcome:'
+            }
         when 'identify' #authorization begins;
             if not dyna.valid and repeatStep
                 @b3.promptIdentity 'Invalid email', {

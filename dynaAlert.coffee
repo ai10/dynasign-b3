@@ -4,7 +4,7 @@ Template.b3Alert.events
         dyna.identity = e.target.value
 
         initial_cb = (e, t) ->
-            return dyna.identifyUnconfirmed e, t
+            return dyna.identityUnconfirmed e, t
 
         confirm_cb = ( e, t ) ->
             return dyna.confirmIdentity e, t
@@ -68,27 +68,18 @@ Template.b3Alert.events
         dyna.nextStep 'resetPassword'
 
     'click button.identity': ( e, t) ->
-        i = t.find('input')
+        i = t.find('input.identity')
         dyna.identity = $(i).val()
-        alert = @_id
-        initial_cb = (e, t) =>
-            return dyna.identifyUnconfirmed e, t, alert
-
-        confirm_cb = ( e, t ) =>
-            return dyna.confirmIdentity e, t, alert
-
-        forgot_cb = ( e, t ) =>
-            return dyna.forgotPassword e, t, { firm: true }
-
-        cb = initial_cb
-
-        if Session.equals('dynaStep', 'confirmation')
-            cb = confirm_cb
-
-        if Session.equals('dynaStep', 'forgot')
-            cb = forgot_cb
-
-        dyna.inputThrottle e, t, cb
+        console.log 'identity', dyna.identity, 'step', Session.get('dynaStep')
+        switch Session.get('dynaStep')
+            when 'identify'
+                return dyna.identityUnconfirmed e, t
+            when 'confirmation'
+                return dyna.confirmIdentity e, t
+            when 'forgot'
+                return dyna.forgotPassword e, t, { firm: true }
+            else
+                return
 
     'click button.changeUser': ( e, t ) ->
         dyna.reset()

@@ -1,19 +1,25 @@
 dyna = @dyna
 dyna.forgotPassword = ( e, t, opt ) ->
-    if e.firm is false then return dyna.nextStep 'forgot'
+    console.log 'forgot password'
     f = t.firstNode || e.target.form
-    dyna.valid = $(f).find('input.identity').parsley('validate')
+    $i = $(f).find('input.identity')
+    dyna.valid = $i.parsley('validate')
+    email = $i.val()
     if not dyna.valid
-        b3.flashError 'invalid: '+e.target.value, { single: 'matchEmail' }
+        b3.flashError 'invalid: '+email, {
+            single: 'matchEmail'
+        }
         return dyna.nextStep 'forgot'
     else
 
-        if dyna.emailMaybe is e.target.value
+        if dyna.emailMaybe is email
             if Session.equals('dynaStep', 'forgot')
-                b3.flashSuccess e.target.value, {
+                b3.flashSuccess email, {
                     header: 'Matched:'
                     single: 'dynaUser'
                 }
+                if opt.firm is false
+                    return dyna.nextStep 'forgot'
                 Accounts.forgotPassword { email: dyna.emailMaybe }, (error)->
                     if error?
                         b3.flashError error.reason
