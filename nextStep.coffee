@@ -51,7 +51,7 @@ dyna.nextStep = (step)=>
     Session.set('dynaStep', step)
     dyna.resetThrottle()
     if Meteor.userId()
-        dyna.emailMaybe = Meteor.user().emails[0].address
+        dyna.emailMaybe = Meteor.user()?.emails[0]?.address
         switch step
             when 'resetPassword'
                 @b3.promptPassword ' a new password', {

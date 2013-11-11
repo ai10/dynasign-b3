@@ -103,7 +103,7 @@ Template.dynaButton.events
                 dyna.reset()
                 dyna.nextStep 'init'
             when 'finished'
-                b3.flashInfo 'This is a dashboard flash.'
+                $('#dashboard').modal('toggle')
             when 'confirmation', 'signUpNew', 'signBack'
                 b3.flashInfo 'Correct identification.'
                 dyna.nextStep 'identify'

@@ -11,7 +11,12 @@ Package.on_use(function (api) {
     api.add_files('mailgun-key.coffee', 'client');
 
     api.add_files(['methods.coffee', 'configs.coffee'], ['client', 'server']);
-
+    /*
+     * api.add_files(
+     * 'dashboardModal.html', 'client'
+     * );
+     *
+     */
     api.add_files([
     'parsley-defaults.coffee',
     'throttle.coffee',
