@@ -27,11 +27,6 @@ if Meteor.isServer
     Accounts.emailTemplates.resetPassword.text = (user, url) ->
         "Follow the link below to reset your password: \n\n"+url
 
-    Accounts.onCreateUser(( options, user)->
-        if options.profile?
-            user.profile = options.profile
-        user
-    )
     do ->
         "use strict"
         Accounts.urls.resetPassword = (token)->
