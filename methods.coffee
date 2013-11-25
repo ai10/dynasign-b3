@@ -1,5 +1,6 @@
 Meteor.methods
     checkIdentity: (email) ->
+        check email, String
         if Meteor.isServer
             user = Meteor.users.findOne { 'emails.address': email }
             if user?
@@ -9,6 +10,7 @@ Meteor.methods
         false
 
     completeVerify: (token) ->
+        check token, String
         if Meteor.isServer
             u = Meteor.user()
             if not u?
