@@ -9,7 +9,7 @@ dyna = @dyna
     selectClass: 'identity'
     header: 'Authentication'
     label: 'Please enter your e-mail.'
-    legend: 'Email.'
+    legend: 'Email identity.'
     placeholder: 'e-mail ...'
     icon: 'glyphicon glyphicon-envelope'
 }
@@ -26,7 +26,8 @@ dyna = @dyna
     selectClass: 'password'
     header: 'Authentication'
     legend: 'Password.'
-    icon: "glyphicon glyphicon-log-in"
+    label: 'Please enter your password.'
+    icon: "glyphicon glyphicon-edit"
 }
 @b3.confirmIdentity = @b3.Prompt::scurry {
     dialog: true
