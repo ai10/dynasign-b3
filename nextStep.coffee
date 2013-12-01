@@ -1,40 +1,39 @@
 dyna = @dyna
-@b3.promptIdentity = @b3.Alert::curry {
+@b3.promptIdentity = @b3.Prompt::scurry {
     dialog: true
     confirmation: true
     buttonText: ""
-    region: 'middleCenter'
     type: 'info'
-    block: 'alert-block'
+    block: ''
     inputType: 'email'
     selectClass: 'identity'
-    header: 'Email'
+    header: 'Authentication'
     label: 'Please enter your e-mail.'
+    legend: 'Email.'
     placeholder: 'e-mail ...'
     icon: 'glyphicon glyphicon-envelope'
 }
 
-@b3.promptPassword = @b3.Alert::curry {
+@b3.promptPassword = @b3.Prompt::scurry {
     dialog: true
     confirmation: true
     label: ''
     type: 'info'
     buttonText: ""
-    region: 'middleCenter'
-    block: 'alert-block'
+    block: ''
     inputType: 'password'
     validation: "data-password=6"
     selectClass: 'password'
-    header: 'Enter Password'
+    header: 'Authentication'
+    legend: 'Password.'
     icon: "glyphicon glyphicon-log-in"
 }
-@b3.confirmIdentity = @b3.Alert::curry {
+@b3.confirmIdentity = @b3.Prompt::scurry {
     dialog: true
     confirmation: false
     buttonText: ' RESET'
     buttonClass: 'warning'
     showAltButton: false
-    region: 'middleCenter'
     altButtonText: " change e-mail."
     altSelectClass: "changeUser"
     type: 'info'
@@ -42,12 +41,13 @@ dyna = @dyna
     block: 'alert-block'
     inputType: 'text'
     header: 'New?'
-    label: "Password Reset"
+    label: ""
+    legend: 'Confirm email.'
     icon: 'glyphicon glyphicon-envelope'
 }
 dyna.nextStep = (step)=>
     repeatStep = Session.equals('dynaStep', step)
-    if not repeatStep then @b3.Alert::remove { dialog: true }
+    if not repeatStep then @b3.Prompt::remove { dialog: true }
     Session.set('dynaStep', step)
     dyna.resetThrottle()
     if Meteor.userId()
@@ -155,7 +155,7 @@ dyna.reset = =>
     dyna.emailMaybe = ''
     dyna.confirmation = false
     dyna.valid = true
-    @b3.Alert::clearAll()
+    @b3.Prompt::clearAll()
     return true
 
 

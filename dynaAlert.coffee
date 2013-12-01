@@ -1,5 +1,5 @@
 dyna = @dyna
-Template.b3Alert.events
+Template.b3Prompt.events
     'keyup input.identity': (e, t) ->
         dyna.identity = e.target.value
 
@@ -54,6 +54,7 @@ Template.b3Alert.events
         if e.keyCode is 13
             e.preventDefault()
             return
+
     'click button.password': ( e, t ) ->
         step = Session.get 'dynaStep'
         if step is 'signUpNew'
@@ -68,6 +69,7 @@ Template.b3Alert.events
         dyna.nextStep 'resetPassword'
 
     'click button.identity': ( e, t) ->
+        console.log 'click button.identity'
         i = t.find('input.identity')
         dyna.identity = $(i).val()
         console.log 'identity', dyna.identity, 'step', Session.get('dynaStep')
