@@ -1,0 +1,8 @@
+{
+    "name": "dynasign-b3",
+    "description": "Interactive email/password signup with Mailgun and Parsley validation.",
+    "homepage": "https://github.com/charlesjshort/dynasign-b3",
+    "author": "Charles J. Short",
+    "version": "0.1.0",
+    "git": "https://github.com/charlesjshort/dynasign-b3.git",
+}
