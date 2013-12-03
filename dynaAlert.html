@@ -1,8 +1,8 @@
 <template name="dynaButton">
-<div class="btn-group navbar-right">
+<div class="btn-group dynaButton">
     <button id="dynaButtonLeft"
         type="button"
-        class="btn {{ button.styleL }} "
+        class="dynaButton btn {{ button.styleL }} "
         data-toggle='tooltip'
         data-placement='auto'
         data-title="{{ button.tooltipL }}"
@@ -21,7 +21,7 @@
         data-container='body'
         data-original-title="{{ button.tooltipR }}"
         data-trigger='hover'
-        class="btn {{ button.styleR }} "
+        class="dynaButton btn {{ button.styleR }} "
         >
       {{ button.textR }}
       <span class=" {{ button.iconR }}"></span>
