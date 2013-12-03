@@ -3,7 +3,7 @@ Package.describe({
 });
 
 Package.on_use(function (api) {
-    api.use(['standard-app-packages', 'http', 'less', 'parsley-b3', 'underscore', 'jquery', 'helpless-b3'], 'client');
+    api.use(['standard-app-packages', 'http', 'parsley-b3', 'underscore', 'jquery', 'helpless-b3'], 'client');
     api.imply('helpless-b3', 'client');
     api.use(['coffeescript', 'accounts-base', 'accounts-password', 'iron-router'], ['client', 'server']);
     api.imply(['accounts-base', 'accounts-password'],['client', 'server']);
@@ -18,7 +18,6 @@ Package.on_use(function (api) {
      *
      */
     api.add_files([
-    'dynaSign.less',
     'parsley-defaults.coffee',
     'throttle.coffee',
     'nextStep.coffee',
