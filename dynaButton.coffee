@@ -28,26 +28,26 @@ Template.dynaButton.button = ->
         when 'confirmation'
             return {
                 textL: dyna.emailMaybe
-                styleL: 'btn-warning'
-                iconL: 'glyphicon glyphicon-warning-sign'
+                styleL: 'btn-danger'
+                iconL: 'glyphicon glyphicon-remove-sign'
                 textR: ''
                 styleR: 'btn-danger'
                 iconR: 'glyphicon glyphicon-remove-sign'
                 size: ''
-                tooltipR: 'Change email.'
-                tooltipL: 'Unconfirmed email.'
+                tooltipR: 'Correct unconfirmed email.'
+                tooltipL: 'Correct unconfirmed email.'
             }
         when 'signUpNew'
             return {
                 textL: dyna.emailMaybe
-                styleL: 'btn-info'
-                iconL: 'glyphicon glyphicon-question-sign'
+                styleL: 'btn-danger'
+                iconL: 'glyphicon glyphicon-remove-sign'
                 textR: ''
                 styleR: 'btn-danger'
                 iconR: 'glyphicon glyphicon-remove-sign'
                 size: ''
-                tooltipR: 'Change email.'
-                tooltipL: 'Is this your correct email?'
+                tooltipR: 'Use a different email address.'
+                tooltipL: 'Use a different email address.'
             }
         when 'signBack'
             return {

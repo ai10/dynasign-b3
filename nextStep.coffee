@@ -42,7 +42,7 @@ dyna = @dyna
     block: 'alert-block'
     inputType: 'text'
     header: 'New?'
-    label: ""
+    label: "Please re-enter your e-mail."
     legend: 'Confirm email.'
     icon: 'glyphicon glyphicon-envelope'
 }
@@ -93,10 +93,10 @@ dyna.nextStep = (step)=>
                     label: dyna.emailMaybe
                 }
             else
-                @b3.confirmIdentity 'Please confirm:', {
+                @b3.confirmIdentity 'Please confirm new account.', {
                     single: 'confirmation'
-                    placeholder: dyna.identity
-                    label: dyna.emailMaybe
+                    placeholder: 're-enter ... '+dyna.identity
+                    label: 'Please re-type: '+dyna.emailMaybe
                 }
             return
         when 'signUpNew', 'signBack' #enter password
