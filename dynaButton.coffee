@@ -51,9 +51,9 @@ Template.dynaButton.button = ->
             }
         when 'signBack'
             return {
-                textL: ""
-                styleL: 'btn-success'
-                iconL: 'glyphicon glyphicon-user'
+                textL: dyna.emailMaybe
+                styleL: 'btn-danger'
+                iconL: 'glyphicon glyphicon-remove-sign'
                 textR: 'Password'
                 styleR: 'btn-inverse btn-default'
                 iconR: 'glyphicon glyphicon-question-sign'
