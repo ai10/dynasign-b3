@@ -103,7 +103,7 @@ Template.dynaButton.events
                 dyna.reset()
                 dyna.nextStep 'init'
             when 'finished'
-                console.log 'dashboard', @
+                lrs.updateModuleStats()
                 b3.dashboardModal 'dashboardX'
             when 'confirmation', 'signUpNew', 'signBack'
                 b3.flashInfo 'Correct identification.'
