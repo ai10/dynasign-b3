@@ -3,7 +3,7 @@ dyna = @dyna
     dialog: true
     confirmation: true
     buttonText: ""
-    type: 'info'
+    type: 'primary'
     block: ''
     inputType: 'email'
     selectClass: 'identity'
@@ -18,7 +18,7 @@ dyna = @dyna
     dialog: true
     confirmation: true
     label: ''
-    type: 'info'
+    type: 'primary'
     buttonText: ""
     block: ''
     inputType: 'password'
@@ -37,7 +37,7 @@ dyna = @dyna
     showAltButton: false
     altButtonText: " change e-mail."
     altSelectClass: "changeUser"
-    type: 'info'
+    type: 'primary'
     selectClass: 'identity'
     block: 'alert-block'
     inputType: 'text'
