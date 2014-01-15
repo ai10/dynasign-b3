@@ -6,18 +6,8 @@
         validationMinLength: 3
         errorClass: 'has-error'
         successClass: 'has-success'
-        validators:
-            password: (val, p) ->
-                i = parseInt(p)
-                console.log 'val, p, i', val, p, i
-                if not /[0-9]/.test(val)
-                    return false
-                if not /[a-z]/i.test(val)
-                    return false
-                if val.lenth < i
-                    return false
-                true
         showErrors: true
+        useHtml5Constraints: true
         messages:
             password: "Insufficiently complex."
             email: "e.g. example@host.net"
