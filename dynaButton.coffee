@@ -11,7 +11,7 @@ Template.dynaButton.created = ->
         dyna.nextStep 'init'
 
 Template.dynaButton.button = ->
-    step = Session.get 'dynaStep'
+    step = Session.get 'dynaStep' or 'init'
     switch step
         when 'init', 'identify', 'resetPassword'
             return {
