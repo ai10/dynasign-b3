@@ -63,7 +63,7 @@ Template.dynaButton.button = ->
             }
         when 'finished' # logged in? or somethings wrong.
             return {
-                textL: dyna.emailMaybe
+                textL: Meteor.user()?.emails[0]?.address or 'No User.'
                 styleL: 'btn-inverse'
                 iconL: 'glyphicon glyphicon-user'
                 textR: ''

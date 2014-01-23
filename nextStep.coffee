@@ -153,7 +153,7 @@ dyna.reset = =>
     dyna.userEmail = 'invalid e-mail'
     dyna.userExisting = false
     dyna.identity = ''
-    dyna.emailMaybe = ''
+    dyna.emailMaybe = Meteor.user()?.emails[0]?.address or 'No User.'
     dyna.confirmation = false
     dyna.valid = true
     @b3.Prompt::clearAll()
