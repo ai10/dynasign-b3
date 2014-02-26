@@ -19,7 +19,6 @@
 
             container: (e, r) ->
                 p = e.parent()
-                console.log 'e,r', e, r
                 return e.context
             ### for putting comment into tooltip
                 s = "div##{e.context.id}.tooltip"

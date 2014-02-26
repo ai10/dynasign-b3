@@ -47,6 +47,7 @@ dyna = @dyna
     icon: 'glyphicon glyphicon-envelope'
 }
 dyna.nextStep = (step)=>
+    console.log 'nextstep', step
     repeatStep = Session.equals('dynaStep', step)
     if not repeatStep then @b3.Prompt::remove { dialog: true }
     Session.set('dynaStep', step)

@@ -1,6 +1,7 @@
 if Meteor.isClient
     dyna = @dyna = {}
     dyna.isInline = true
+    dyna.requestProfileCompletion = true
 
 if Meteor.isServer
 

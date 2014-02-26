@@ -52,4 +52,7 @@ dyna.signBack = ( e , t )->
                 header: 'Authenticated:'
                 single: 'dynaPass'
             }
+            if dyna.requestProfileCompletion
+                unless Meteor.user().profile?.profileComplete is true
+                    b3.alertInfo 'Please complete your profile.', { routeTo: 'profile' }
             dyna.nextStep 'finished'
