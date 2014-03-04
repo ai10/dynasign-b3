@@ -39,7 +39,7 @@ dyna.forgotPassword = ( e, t, opt ) ->
                 dyna.nextStep 'forgot'
         else
             b3.flashWarn  'input', {
-                    header: dyna.emailMaybe+'- should match -'
-                    single: 'dynaUser'
-                }
-                dyna.nextStep 'forgot'
+                header: dyna.emailMaybe+'- should match -'
+                single: 'dynaUser'
+            }
+            dyna.nextStep 'forgot'
