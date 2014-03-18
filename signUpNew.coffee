@@ -1,6 +1,5 @@
 dyna = @dyna
 dyna.signUpNew = ( e, t ) ->
-    console.log 'signUpNew', e, t
     hasError = false
     e.preventDefault()
     f = t.firstNode?.form or e.target?.form
@@ -16,7 +15,7 @@ dyna.signUpNew = ( e, t ) ->
 
     email = dyna.emailMaybe or dyna.identity
     profile = dyna.accounts?.profile? or {}
-    return Accounts.createUser {
+    uid = Accounts.createUser {
         email: email,
         password: password,
         profile: profile
@@ -30,4 +29,3 @@ dyna.signUpNew = ( e, t ) ->
             b3.flashSuccess 'Welcome! Thanks for signing up.'
             b3.flashInfo "Verification e-mail for #{email}."
             dyna.nextStep 'finished'
-
